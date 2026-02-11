@@ -137,7 +137,12 @@ public class EmailValidator_ChatGPTTest {
 
     @Test
     void testEmailInvalidoMuitoLongo() {
-        String emailLongo = "a".replaceAll(".", "a").substring(0, 100) + "@" + "b".replaceAll(".", "b").substring(0, 100) + ".com";
+        // Cria uma string de 100 caracteres 'a'
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 100; i++) {
+            sb.append('a');
+        }
+        String emailLongo = sb.toString() + "@" + sb.toString() + ".com";
         assertFalse(EmailValidator.isValid(emailLongo));
     }
 
