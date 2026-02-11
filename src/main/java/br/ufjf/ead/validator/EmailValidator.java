@@ -51,14 +51,36 @@ public class EmailValidator {
         // Remove espaços em branco
         String cleanEmail = email.trim();
         
+        // Verifica tamanho máximo primeiro para evitar StringIndexOutOfBounds
+        if (cleanEmail.length() > 254) {
+            throw new InvalidDocumentException("E-mail muito longo");
+        }
+        
         // Verifica tamanho mínimo
         if (cleanEmail.length() < 5) {
             throw new InvalidDocumentException("E-mail muito curto");
         }
         
-        // Verifica tamanho máximo
-        if (cleanEmail.length() > 254) {
-            throw new InvalidDocumentException("E-mail muito longo");
+        // Verifica se contém '@'
+        int atIndex = cleanEmail.indexOf('@');
+        if (atIndex == -1 || atIndex == 0 || atIndex == cleanEmail.length() - 1) {
+            throw new InvalidDocumentException("E-mail deve conter exatamente um '@' em posição válida");
+        }
+        
+        // Verifica se tem mais de um '@'
+        if (cleanEmail.indexOf('@', atIndex + 1) != -1) {
+            throw new InvalidDocumentException("E-mail não pode conter mais de um '@'");
+        }
+        
+        // Verifica se tem pontos consecutivos antes do '@'
+        String localPart = cleanEmail.substring(0, atIndex);
+        if (localPart.contains("..")) {
+            throw new InvalidDocumentException("E-mail não pode conter pontos consecutivos");
+        }
+        
+        // Verifica se começa ou termina com ponto no local part
+        if (localPart.startsWith(".") || localPart.endsWith(".")) {
+            throw new InvalidDocumentException("Local part do e-mail não pode começar ou terminar com ponto");
         }
         
         // Verifica formato básico
@@ -67,9 +89,14 @@ public class EmailValidator {
         }
         
         // Verifica domínio
-        String domain = cleanEmail.substring(cleanEmail.lastIndexOf('@') + 1);
+        String domain = cleanEmail.substring(atIndex + 1);
         if (domain.startsWith(".") || domain.endsWith(".")) {
             throw new InvalidDocumentException("Domínio inválido");
+        }
+        
+        // Verifica se o domínio tem pelo menos um ponto
+        if (!domain.contains(".")) {
+            throw new InvalidDocumentException("Domínio deve conter pelo menos um ponto");
         }
         
         // Verifica domínios conhecidos como inválidos

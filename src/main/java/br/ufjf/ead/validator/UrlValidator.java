@@ -87,6 +87,10 @@ public class UrlValidator {
         } else {
             // URL com path
             String[] domainPath = remaining.split("/", 2);
+            if (domainPath.length < 2) {
+                throw new InvalidDocumentException("Formato de URL com path inválido");
+            }
+            
             String domain = domainPath[0];
             String path = "/" + domainPath[1];
             
@@ -295,8 +299,12 @@ public class UrlValidator {
         cleanUrl = cleanUrl.replace(":///", "://");
         
         // Remove barras no final se não houver path
-        if (!cleanUrl.substring(cleanUrl.indexOf("://") + 3).contains("/")) {
-            cleanUrl = cleanUrl.replaceAll("/+$", "");
+        int protocolIndex = cleanUrl.indexOf("://");
+        if (protocolIndex != -1) {
+            String afterProtocol = cleanUrl.substring(protocolIndex + 3);
+            if (!afterProtocol.contains("/")) {
+                cleanUrl = cleanUrl.replaceAll("/+$", "");
+            }
         }
         
         return cleanUrl;
