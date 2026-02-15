@@ -1,5 +1,6 @@
-# Markdown files (excluded from commits)
+# Documentation and report files (excluded from commits)
 *.md
+*.txt
 
 # Compiled class files
 *.class
