@@ -62,6 +62,12 @@
             <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <version>5.9.3</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -77,12 +83,21 @@
                 </configuration>
             </plugin>
 
-            <!-- Surefire Plugin para executar testes -->
-        <plugin>
-            <groupId>org.sonarsource.scanner.maven</groupId>
-            <artifactId>sonar-maven-plugin</artifactId>
-            <version>3.11.0.3922</version>
-        </plugin>
+            <!-- Surefire Plugin para executar testes JUnit 4 e JUnit 5 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.2</version>
+                <configuration>
+                    <failIfNoTests>false</failIfNoTests>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>3.11.0.3922</version>
+            </plugin>
 
             <!-- JaCoCo Plugin para cobertura de código -->
             <plugin>
@@ -141,13 +156,28 @@
                 <artifactId>evosuite-maven-plugin</artifactId>
                 <version>${evosuite.version}</version>
                 <executions>
+                    <!-- Execução para gerar testes (comentada - executar manualmente quando necessário) -->
+                    <!-- Para gerar: mvn evosuite:generate -Dclasses=br.ufjf.ead.validator.EmailValidator ... -->
                     <execution>
+                        <id>prepare</id>
+                        <phase>process-test-classes</phase>
                         <goals>
                             <goal>prepare</goal>
                         </goals>
-                        <phase>process-test-classes</phase>
                     </execution>
                 </executions>
+                <configuration>
+                    <!-- Notas sobre geração manual:
+                    1. O EvoSuite precisa ser executado por classe individualmente
+                    2. Usar comando: mvn evosuite:generate -Dclasses=CLASSE_COMPLETA
+                    3. Exemplos:
+                       mvn evosuite:generate '-Dclasses=br.ufjf.ead.validator.EmailValidator'
+                       mvn evosuite:generate '-Dclasses=br.ufjf.ead.validator.PasswordValidator'
+                       mvn evosuite:generate '-Dclasses=br.ufjf.ead.validator.CreditCardValidator'
+                    4. Depois compilar: mvn test-compile
+                    5. E executar: mvn test '-Dtest=*ESTest'
+                    -->
+                </configuration>
             </plugin>
         </plugins>
     </build>
